@@ -1,0 +1,48 @@
+{
+  "parcel": {
+    "pin": "7222000353",
+    "address": "1817 Morris Ave S, Renton, WA 98055",
+    "jurisdiction": "king-county-wa",
+    "_source": "PIN and address user-provided"
+  },
+  "assessed": {
+    "assessment_year": null,
+    "tax_year": null,
+    "total_assessed_value": null,
+    "land_value": null,
+    "improvement_value": null,
+    "levy_code": null,
+    "_status": "NEEDS_FETCH — rpacct_extr or eReal Property value panel. Sandbox cannot reach kingcounty.gov; consumer portals are JS-rendered."
+  },
+  "characteristics": {
+    "living_area_sqft": 1140,
+    "bedrooms": 3,
+    "bathrooms": 1,
+    "lot_size_acres": 0.33,
+    "structure_type": "single-family rambler",
+    "year_built": null,
+    "grade": null,
+    "condition": null,
+    "_source": "public street-level listing records (2012 MLS history)",
+    "_status": "PARTIAL — confirm sqft/beds/baths/lot against residential-building extract; year_built, grade, condition NEEDS_FETCH"
+  },
+  "last_sale": {
+    "price": 195000,
+    "date": "2012-11-21",
+    "arms_length": true,
+    "_note": "history only — far too old to serve as a comp near a current assessment date"
+  },
+  "owner_inputs": {
+    "filer_identity": null,
+    "notice_mailing_date": null,
+    "condition_defects": null,
+    "record_corrections": null,
+    "recent_purchase": null,
+    "exhibits": [],
+    "_status": "NOT_PROVIDED — filer_identity and notice_mailing_date are required to file; the rest are the owner's evidentiary edge"
+  },
+  "effective_rate": {
+    "value": null,
+    "_status": "NEEDS — Treasurer billed_tax / total_assessed_value; endpoint not yet captured"
+  }
+}

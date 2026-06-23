@@ -1,0 +1,6 @@
+extracts/*.csv
+extracts/*.zip
+run/
+__pycache__/
+*.pyc
+.DS_Store
