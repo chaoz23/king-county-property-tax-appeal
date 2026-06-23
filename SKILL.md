@@ -1,16 +1,16 @@
 ---
-name: property-tax-appeal-forge
+name: king-county-property-tax-appeal
 description: >-
-  Build a complete, filing-ready property tax assessment appeal package for a residential
-  property — the same deliverable contingency services (Owlue, Ownwell) charge 25% of first-year
-  savings for. Resolves a parcel, pulls the assessed value and comparable sales from official
-  county data, runs a defensible over-assessment analysis, estimates tax savings, and generates an
-  evidence packet plus the petition fields needed to file. Use this whenever the user wants to
-  appeal, protest, or lower a property tax assessment; questions whether their assessed value is
-  too high; received a valuation/change-of-value notice or a tax-appeal solicitation letter; or
-  asks how much they could save by appealing. Trigger even when the user only names a property,
-  parcel number, or assessment amount and asks "is this worth appealing?" v1 covers King County, WA;
-  the jurisdiction layer is swappable.
+  Build a complete, filing-ready property tax assessment appeal package for a King County, WA
+  residential property — the same deliverable contingency services (Owlue, Ownwell) charge 25%
+  of first-year savings for. Resolves a parcel, pulls the assessed value and comparable sales
+  from official King County data, runs a defensible over-assessment analysis, estimates tax
+  savings, and generates an evidence packet plus the petition fields needed to file. Use this
+  whenever the user wants to appeal, protest, or lower a King County property tax assessment;
+  questions whether their assessed value is too high; received a valuation/change-of-value
+  notice or a tax-appeal solicitation letter; or asks how much they could save by appealing.
+  Trigger even when the user only names a King County property, parcel number, or assessment
+  amount and asks "is this worth appealing?"
 ---
 
 # Property Tax Appeal Forge

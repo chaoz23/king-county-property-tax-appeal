@@ -1,6 +1,6 @@
-# Property Tax Appeal Forge
+# King County Property Tax Appeal
 
-When the user asks about appealing a property tax assessment, checking if their assessment is too high, or analyzing a King County WA property address — run the pipeline scripts in order:
+When the user asks about appealing a King County WA property tax assessment, checking if their assessment is too high, or analyzing a King County property address — run the pipeline scripts in order:
 
 ```bash
 bash scripts/setup.sh                              # one-time extract download

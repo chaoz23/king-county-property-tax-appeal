@@ -1,8 +1,6 @@
-# Property Tax Appeal Forge
+# King County Property Tax Appeal
 
-Build a filing-ready property tax appeal packet from an address — the same deliverable contingency services like Owlue and Ownwell charge 25% of first-year savings for.
-
-**v1 covers King County, WA.** The jurisdiction layer is designed to be swappable.
+Build a filing-ready property tax appeal packet for any King County, WA residential property — the same deliverable contingency services like Owlue and Ownwell charge 25% of first-year savings for.
 
 ## What it does
 
