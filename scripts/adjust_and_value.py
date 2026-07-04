@@ -144,21 +144,22 @@ def adjust_comp(subject: dict, comp: dict, assessment_date: datetime) -> dict:
 
 def reconcile(adjusted_comps: list[dict]) -> dict:
     """Derive indicated range and opinion of value from adjusted comps."""
+    if not adjusted_comps:
+        raise ValueError("reconciliation requires at least one adjusted comp")
+
+    # The opposing flag identifies a comp to discuss, not evidence to discard.
+    # Reconcile every selected comp so the range, weighting, opinion, and count
+    # all describe the same evidence set.
+    prices = [c["adjusted_price"] for c in adjusted_comps]
+
     # Weight by inverse gross adjustment percentage (lower = more comparable)
-    regular = [c for c in adjusted_comps if not c["opposing_comp"]]
-    if not regular:
-        regular = adjusted_comps
-
-    prices = [c["adjusted_price"] for c in regular]
-    all_prices = [c["adjusted_price"] for c in adjusted_comps]
-
     low = min(prices)
     high = max(prices)
 
     # Weighted average — weight = 1 / (1 + gross_adj_pct)
     weighted_sum = 0
     weight_total = 0
-    for c in regular:
+    for c in adjusted_comps:
         w = 1.0 / (1.0 + c["gross_adj_pct"] / 100.0)
         weighted_sum += c["adjusted_price"] * w
         weight_total += w
@@ -183,7 +184,6 @@ def reconcile(adjusted_comps: list[dict]) -> dict:
             f"supported by the comp range."
         ),
         "comp_count": len(adjusted_comps),
-        "regular_count": len(regular),
     }
 
 
