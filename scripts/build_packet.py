@@ -5,7 +5,7 @@ Reads all run artifacts (subject, comps, valuation, decision) and produces:
   - petition.json — pre-filled eAppeals petition fields
   - evidence_packet.md — the evidence narrative + adjustment grid (markdown,
     convertible to PDF via the pdf skill or pandoc)
-  - deadline.md — filing deadline and evidence-exchange date
+  - deadline.md — filing and evidence-deadline guidance
 
 SKILL.md Stage 7.
 """
@@ -14,16 +14,6 @@ import json
 import os
 import sys
 from datetime import datetime, timedelta
-
-
-def business_days_before(target: datetime, n: int) -> datetime:
-    """Subtract n business days from target."""
-    d = target
-    while n > 0:
-        d -= timedelta(days=1)
-        if d.weekday() < 5:
-            n -= 1
-    return d
 
 
 def build_petition(subject: dict, valuation: dict, decision: dict) -> dict:
@@ -206,7 +196,7 @@ def build_evidence_markdown(subject: dict, valuation: dict, decision: dict) -> s
 
 
 def build_deadline(subject: dict) -> str:
-    """Compute filing deadline from KC rules."""
+    """Render King County deadline guidance without guessing unknown dates."""
     assessment_year = subject["assessed"].get("assessment_year", 2025)
     notice_date_str = (subject.get("owner_inputs") or {}).get("notice_mailing_date")
 
@@ -224,19 +214,20 @@ def build_deadline(subject: dict) -> str:
         lines.append(f"**July 1 deadline:** {july1.strftime('%B %d, %Y')}")
         lines.append(f"**Filing deadline (later of the two):** {deadline.strftime('%B %d, %Y')}")
     else:
-        lines.append(f"**July 1 deadline:** {july1.strftime('%B %d, %Y')}")
+        lines.append("**Filing deadline: unresolved — notice mailing date required.**")
         lines.append(
-            "**Notice mailing date not provided.** The filing deadline is the later of "
-            f"July 1, {assessment_year} or 60 days from the notice mailing date. "
-            "Confirm the mailing date from the actual valuation notice."
+            f"King County's rule is the later of July 1, {assessment_year} or 60 calendar "
+            "days from the mailing date printed on the valuation notice. Do not rely on "
+            "July 1 alone; confirm the mailing date on the notice or the BOE portal."
         )
-        deadline = july1
 
     lines.append("")
-    evidence_exchange = business_days_before(deadline + timedelta(days=45), 21)
     lines.append(
-        f"**Evidence exchange deadline (est.):** {evidence_exchange.strftime('%B %d, %Y')} "
-        "(21 business days before estimated hearing)"
+        "**Evidence submission deadline: unresolved until the BOE assigns the hearing date.**"
+    )
+    lines.append(
+        "Submit all evidence to both the BOE and the Assessor at least 21 business days "
+        "before the actual hearing date shown in the BOE notice."
     )
     lines.append("")
     lines.append(
