@@ -43,8 +43,9 @@ exceptions exist for prior years).
   one petition **per parcel**.
 - Both parties must exchange any additional evidence with the BOE **and** the other party at least
   **21 business days** before the hearing. The Assessor does not forward your evidence for you.
-- Hearings are generally scheduled ~45 days out, in order received; completing evidence submission
-  early can qualify for an expedited hearing.
+- Hearing dates are assigned by the BOE and may take six months or more because of appeal volume;
+  never estimate the evidence deadline from the filing date. Completing evidence submission and
+  receiving the Assessor's response can make an appeal eligible for an expedited hearing request.
 - BOE issues a written decision within ~45 days of the hearing.
 - Either party may appeal to the **WA State Board of Tax Appeals within 30 days** of the decision.
 - Pay the existing tax bill on schedule (first half Apr 30, second half Oct 31) while pending; a

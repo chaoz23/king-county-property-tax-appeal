@@ -30,7 +30,7 @@ bash scripts/run_appeal.sh "1817 Morris Ave S, Renton, WA 98055"
 Output lands in `run/<PIN>/`:
 - `petition.json` — pre-filled eAppeals petition fields
 - `evidence_packet.md` — comp grid, adjustments, opinion of value
-- `deadline.md` — filing deadline based on KC mailing schedule
+- `deadline.md` — filing rule and exact deadline when the notice mailing date is known
 - `decision.json` — go/no-go with savings estimate
 - Plus: `subject.json`, `comps.json`, `valuation.json`, `parcel.json`
 

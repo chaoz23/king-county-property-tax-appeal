@@ -107,8 +107,8 @@ Write `subject.json`.
 
 Compute the filing deadline from the jurisdiction rule and the mailing date. If it has passed,
 **stop** and tell the user when the next cycle opens. Otherwise record the deadline and the
-evidence-exchange date (jurisdiction-specific, e.g. King County = 21 business days before hearing)
-in `deadline.md`.
+evidence-exchange rule in `deadline.md`. Never invent an exact date when the notice mailing date
+or hearing date is unknown.
 
 ### Stage 3 — Comp acquisition
 
@@ -194,7 +194,8 @@ artifacts plus the deadline — nothing else:
   the assessor's value is wrong; comparable-sales grid with adjustments; a location map of subject +
   comps; the adjustment methodology; condition exhibits (photos/bids) if provided. This is the thing
   that wins it.
-- **`deadline.md`** — the filing deadline and the evidence-exchange date, surfaced in the summary.
+- **`deadline.md`** — the filing deadline and evidence-exchange rule, with exact dates only when
+  the controlling notice dates are known, surfaced in the summary.
 
 Close by telling the owner the filing deadline, where to file, and that they must still pay the
 existing tax bill while the appeal is pending to avoid penalties (a refund issues if they win).
