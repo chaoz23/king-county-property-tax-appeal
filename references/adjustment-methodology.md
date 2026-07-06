@@ -35,6 +35,8 @@ comp. Comp is smaller than subject → add for the missing area.
 
 ## Reliability discipline
 
+- Never substitute zero for an unknown characteristic. Require core comparison fields such as GLA
+  and grade; omit an optional adjustment when either side is unknown and disclose the omission.
 - Track **gross adjustment** (sum of absolute adjustments) per comp. Low gross = more comparable =
   weight it more in reconciliation. Flag any comp needing large gross adjustment as weaker support.
 - **Consistency** (ties to SKILL.md Stage 6 defensibility): the same feature is adjusted in the same

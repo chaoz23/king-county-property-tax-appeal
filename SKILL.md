@@ -145,6 +145,8 @@ Write `comps.json` (retained comps plus any flagged opposing comp).
 Adjust each comp to the subject with a transparent grid (`scripts/adjust_and_value.py`):
 time/market, living area (GLA), lot size, grade/condition, bed/bath, and notable features (garage,
 view, waterfront). Adjustments must be defensible and documented — the grid IS the argument.
+Living area and grade must be known for both subject and comp; stop rather than valuing incomplete
+core evidence. Apply optional adjustments only when both values are known. Unknown never means zero.
 
 Derive an indicated value range, then choose a **conservative opinion of value** (lean toward the
 better-supported low end; you are arguing the assessor is high, but an aggressive number invites

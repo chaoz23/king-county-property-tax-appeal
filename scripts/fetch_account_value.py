@@ -71,10 +71,12 @@ def parse_building_details(html: str) -> dict:
         result["lot_size_sqft"] = int(lot.replace(",", ""))
 
     views = details.get("Views", "").strip()
-    result["views"] = views.lower() not in ("no", "")
+    if views:
+        result["views"] = views.lower() != "no"
 
     waterfront = details.get("Waterfront", "").strip()
-    result["waterfront"] = bool(waterfront and waterfront.lower() != "no")
+    if waterfront:
+        result["waterfront"] = waterfront.lower() != "no"
 
     return result
 
