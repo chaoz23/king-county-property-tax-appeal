@@ -6,6 +6,8 @@ SKILL.md Stage 3 (time / geography / physical / arm's-length), and writes
 comps.json. Run download_extracts.sh first if extracts are missing.
 """
 
+from __future__ import annotations
+
 import csv
 import json
 import math
@@ -50,6 +52,32 @@ EXCLUDE_INSTRUMENTS = {
 }
 
 
+def parse_optional_int(row: dict, *keys: str) -> int | None:
+    """Parse the first populated integer field, preserving missing as None."""
+    for key in keys:
+        raw = row.get(key)
+        if raw is None or str(raw).strip() == "":
+            continue
+        try:
+            return int(str(raw).strip())
+        except ValueError:
+            continue
+    return None
+
+
+def parse_optional_float(row: dict, *keys: str) -> float | None:
+    """Parse the first populated float field, preserving missing as None."""
+    for key in keys:
+        raw = row.get(key)
+        if raw is None or str(raw).strip() == "":
+            continue
+        try:
+            return float(str(raw).strip())
+        except ValueError:
+            continue
+    return None
+
+
 def load_resbldg(extracts_dir: str) -> dict:
     """Load residential building extract → dict keyed by PIN."""
     path = os.path.join(extracts_dir, "EXTR_ResBldg.csv")
@@ -64,50 +92,25 @@ def load_resbldg(extracts_dir: str) -> dict:
             minor = (row.get("Minor") or row.get("MINOR") or "").strip().zfill(4)
             pin = major + minor
 
-            try:
-                sqft = int(row.get("SqFtTotLiving") or row.get("SQFTTOTLIVING") or 0)
-            except ValueError:
-                sqft = 0
+            sqft = parse_optional_int(row, "SqFtTotLiving", "SQFTTOTLIVING")
+            yr = parse_optional_int(row, "YrBuilt", "YRBUILT")
+            grade = parse_optional_int(row, "BldgGrade", "BLDGGRADE")
+            beds = parse_optional_int(row, "Bedrooms", "BEDROOMS")
 
-            try:
-                yr = int(row.get("YrBuilt") or row.get("YRBUILT") or 0)
-            except ValueError:
-                yr = 0
+            baths_full = parse_optional_int(row, "BathFullCount", "BATHFULLCOUNT")
+            baths_3q = parse_optional_int(row, "Bath3qtrCount", "BATH3QTRCOUNT")
+            baths_half = parse_optional_int(row, "BathHalfCount", "BATHHALFCOUNT")
+            bath_parts = (baths_full, baths_3q, baths_half)
+            bath_count = None
+            if any(part is not None for part in bath_parts):
+                bath_count = (
+                    (baths_full or 0)
+                    + 0.75 * (baths_3q or 0)
+                    + 0.5 * (baths_half or 0)
+                )
 
-            try:
-                grade = int(row.get("BldgGrade") or row.get("BLDGGRADE") or 0)
-            except ValueError:
-                grade = 0
-
-            try:
-                beds = int(row.get("Bedrooms") or row.get("BEDROOMS") or 0)
-            except ValueError:
-                beds = 0
-
-            try:
-                baths_full = int(row.get("BathFullCount") or row.get("BATHFULLCOUNT") or 0)
-            except ValueError:
-                baths_full = 0
-            try:
-                baths_3q = int(row.get("Bath3qtrCount") or row.get("BATH3QTRCOUNT") or 0)
-            except ValueError:
-                baths_3q = 0
-            try:
-                baths_half = int(row.get("BathHalfCount") or row.get("BATHHALFCOUNT") or 0)
-            except ValueError:
-                baths_half = 0
-
-            bath_count = baths_full + 0.75 * baths_3q + 0.5 * baths_half
-
-            try:
-                condition = int(row.get("PcntCondition") or row.get("PCNTCONDITION") or 0)
-            except ValueError:
-                condition = 0
-
-            try:
-                stories = float(row.get("Stories") or row.get("STORIES") or 0)
-            except ValueError:
-                stories = 0
+            condition = parse_optional_int(row, "PcntCondition", "PCNTCONDITION")
+            stories = parse_optional_float(row, "Stories", "STORIES")
 
             zipcode = (row.get("ZipCode") or "").strip()[:5]
 
@@ -223,7 +226,7 @@ def load_and_filter_sales(
 
             # Get building data
             bldg = buildings.get(pin)
-            if not bldg or bldg["sqft"] == 0:
+            if not bldg or not bldg["sqft"]:
                 continue
 
             # Physical similarity: sqft within ±30%
@@ -232,8 +235,11 @@ def load_and_filter_sales(
                 continue
 
             # Grade within ±2
-            if subj_grade and bldg["grade"] and abs(bldg["grade"] - subj_grade) > 2:
-                continue
+            if subj_grade:
+                if not bldg["grade"]:
+                    continue
+                if abs(bldg["grade"] - subj_grade) > 2:
+                    continue
 
             # Geographic filter: same or nearby ZIP code
             if nearby_zips and bldg.get("zipcode"):

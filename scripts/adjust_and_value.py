@@ -8,6 +8,8 @@ opinion of value. Writes valuation.json.
 See references/adjustment-methodology.md for the adjustment framework.
 """
 
+from __future__ import annotations
+
 import json
 import os
 import sys
@@ -26,6 +28,34 @@ RATES = {
     "view_premium": 30000,        # view vs no-view
     "waterfront_premium": 150000, # waterfront vs none
 }
+
+
+def require_positive(mapping: dict, key: str, label: str) -> int | float:
+    """Return a required positive number or reject incomplete evidence."""
+    value = mapping.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+        raise ValueError(f"{label} must be a known positive number")
+    return value
+
+
+def optional_nonnegative(mapping: dict, key: str, label: str) -> int | float | None:
+    """Return an optional nonnegative number without converting unknown to zero."""
+    value = mapping.get(key)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
+        raise ValueError(f"{label} must be a nonnegative number when provided")
+    return value
+
+
+def optional_positive(mapping: dict, key: str, label: str) -> int | float | None:
+    """Return an optional positive number without converting unknown to zero."""
+    value = mapping.get(key)
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+        raise ValueError(f"{label} must be a positive number when provided")
+    return value
 
 
 def adjust_comp(subject: dict, comp: dict, assessment_date: datetime) -> dict:
@@ -48,14 +78,14 @@ def adjust_comp(subject: dict, comp: dict, assessment_date: datetime) -> dict:
         })
 
     # 2. Living area (GLA) — comp superior → subtract; comp inferior → add
-    subj_sqft = subj.get("living_area_sqft", 0)
-    comp_sqft = bldg.get("sqft", 0)
+    subj_sqft = require_positive(subj, "living_area_sqft", "subject living area")
+    comp_sqft = require_positive(bldg, "sqft", "comp living area")
     sqft_diff = subj_sqft - comp_sqft  # positive = subject larger = add to comp
     if sqft_diff != 0:
         gla_adj = sqft_diff * RATES["gla_per_sqft"]
         adjustments.append({
             "category": "Living Area (GLA)",
-            "basis": f"{sqft_diff:+d} sqft × ${RATES['gla_per_sqft']}/sqft",
+            "basis": f"{sqft_diff:+g} sqft × ${RATES['gla_per_sqft']}/sqft",
             "amount": gla_adj,
         })
 
@@ -65,59 +95,61 @@ def adjust_comp(subject: dict, comp: dict, assessment_date: datetime) -> dict:
     # TODO: cross-reference with Parcel extract for comp lot sizes
 
     # 4. Grade
-    subj_grade = subj.get("grade", 0)
-    comp_grade = bldg.get("grade", 0)
+    subj_grade = require_positive(subj, "grade", "subject grade")
+    comp_grade = require_positive(bldg, "grade", "comp grade")
     grade_diff = subj_grade - comp_grade
     if grade_diff != 0:
         grade_adj = grade_diff * RATES["grade_per_step"]
         adjustments.append({
             "category": "Grade",
-            "basis": f"Subject {subj_grade} vs comp {comp_grade} ({grade_diff:+d} steps × ${RATES['grade_per_step']:,})",
+            "basis": f"Subject {subj_grade} vs comp {comp_grade} ({grade_diff:+g} steps × ${RATES['grade_per_step']:,})",
             "amount": grade_adj,
         })
 
     # 5. Year built (age proxy for condition)
-    subj_yr = subj.get("year_built", 0)
-    comp_yr = bldg.get("year_built", 0)
-    if subj_yr and comp_yr:
+    subj_yr = optional_positive(subj, "year_built", "subject year built")
+    comp_yr = optional_positive(bldg, "year_built", "comp year built")
+    if subj_yr is not None and comp_yr is not None:
         yr_diff = comp_yr - subj_yr  # positive = comp newer = comp superior = subtract
         if yr_diff != 0:
             age_adj = -yr_diff * RATES["year_built_per_yr"]
             adjustments.append({
                 "category": "Year Built / Age",
-                "basis": f"Subject {subj_yr} vs comp {comp_yr} ({yr_diff:+d} yrs × ${RATES['year_built_per_yr']})",
+                "basis": f"Subject {subj_yr} vs comp {comp_yr} ({yr_diff:+g} yrs × ${RATES['year_built_per_yr']})",
                 "amount": age_adj,
             })
 
     # 6. Bedrooms
-    subj_beds = subj.get("bedrooms", 0)
-    comp_beds = bldg.get("bedrooms", 0)
-    bed_diff = subj_beds - comp_beds
-    if bed_diff != 0:
-        bed_adj = bed_diff * RATES["bedroom_each"]
-        adjustments.append({
-            "category": "Bedrooms",
-            "basis": f"Subject {subj_beds} vs comp {comp_beds} ({bed_diff:+d} × ${RATES['bedroom_each']:,})",
-            "amount": bed_adj,
-        })
+    subj_beds = optional_nonnegative(subj, "bedrooms", "subject bedrooms")
+    comp_beds = optional_nonnegative(bldg, "bedrooms", "comp bedrooms")
+    if subj_beds is not None and comp_beds is not None:
+        bed_diff = subj_beds - comp_beds
+        if bed_diff != 0:
+            bed_adj = bed_diff * RATES["bedroom_each"]
+            adjustments.append({
+                "category": "Bedrooms",
+                "basis": f"Subject {subj_beds} vs comp {comp_beds} ({bed_diff:+g} × ${RATES['bedroom_each']:,})",
+                "amount": bed_adj,
+            })
 
     # 7. Bathrooms
-    subj_baths = subj.get("bathrooms", 0)
-    comp_baths = bldg.get("bathrooms", 0)
-    bath_diff = subj_baths - comp_baths
-    if abs(bath_diff) >= 0.25:
-        bath_adj = round(bath_diff * RATES["bathroom_each"])
-        adjustments.append({
-            "category": "Bathrooms",
-            "basis": f"Subject {subj_baths} vs comp {comp_baths} ({bath_diff:+.2f} × ${RATES['bathroom_each']:,})",
-            "amount": bath_adj,
-        })
+    subj_baths = optional_nonnegative(subj, "bathrooms", "subject bathrooms")
+    comp_baths = optional_nonnegative(bldg, "bathrooms", "comp bathrooms")
+    if subj_baths is not None and comp_baths is not None:
+        bath_diff = subj_baths - comp_baths
+        if abs(bath_diff) >= 0.25:
+            bath_adj = round(bath_diff * RATES["bathroom_each"])
+            adjustments.append({
+                "category": "Bathrooms",
+                "basis": f"Subject {subj_baths} vs comp {comp_baths} ({bath_diff:+.2f} × ${RATES['bathroom_each']:,})",
+                "amount": bath_adj,
+            })
 
     # 8. View
-    subj_view = subj.get("views", False)
-    comp_view = bldg.get("view_utilization", 0)
+    subj_view = subj.get("views")
+    comp_view = bldg.get("view_utilization")
     # ResBldg ViewUtilization > 0 means view
-    if not subj_view and comp_view:
+    if subj_view is not None and comp_view is not None and not subj_view and comp_view:
         adjustments.append({
             "category": "View",
             "basis": "Comp has view, subject does not → subtract",
