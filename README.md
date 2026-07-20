@@ -17,8 +17,8 @@ Given a residential property address, the pipeline:
 
 ```bash
 # Clone
-git clone https://github.com/yourusername/property-tax-appeal-forge.git
-cd property-tax-appeal-forge
+git clone https://github.com/chaoz23/king-county-property-tax-appeal.git
+cd king-county-property-tax-appeal
 
 # One-time: download King County data extracts (~180MB download, ~880MB on disk)
 bash scripts/setup.sh
